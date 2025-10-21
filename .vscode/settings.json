@@ -1,0 +1,10 @@
+{
+    "dart.flutterSdkPath": null,
+    "dart.debugExternalLibraries": false,
+    "dart.debugSdkLibraries": false,
+    "dart.previewFlutterUiGuides": true,
+    "dart.previewFlutterUiGuidesCustomTracking": true,
+    "files.associations": {
+        "*.dart": "dart"
+    }
+}
