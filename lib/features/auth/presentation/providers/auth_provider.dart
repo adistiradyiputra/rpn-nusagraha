@@ -31,12 +31,24 @@ class AuthProvider extends ChangeNotifier {
       _setLoading(true);
       _clearError();
       
+      // Execute login - ini akan menyimpan token
       final user = await _loginUseCase.execute(request);
+      
+      // Verifikasi token tersimpan
+      if (ApiService.token == null || ApiService.token!.isEmpty) {
+        throw Exception('Token tidak berhasil disimpan. Silakan coba lagi.');
+      }
+      
       _user = user;
       _status = AuthStatus.authenticated;
       
       // Save user data to SharedPreferences
-      await _saveUserData(user);
+      try {
+        await _saveUserData(user);
+      } catch (e) {
+        print('Warning: Gagal menyimpan data user: $e');
+        // User data bisa dimuat ulang dari API, jadi tidak perlu error
+      }
       
       return true;
     } catch (e) {
@@ -55,16 +67,31 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> checkAuthStatus() async {
-    if (ApiService.token != null) {
-      _status = AuthStatus.authenticated;
-      // Load user data from storage or API
-      await _loadUserData();
-      notifyListeners();
-    } else {
+    try {
+      // Pastikan token sudah dimuat dari storage
+      await ApiService.loadToken();
+      
+      if (ApiService.token != null && ApiService.token!.isNotEmpty) {
+        _status = AuthStatus.authenticated;
+        // Load user data from storage or API
+        await _loadUserData();
+        
+        // Jika tidak ada user data, set unauthenticated
+        if (_user == null) {
+          print('Token ada tapi user data tidak ada, perlu login ulang');
+          _status = AuthStatus.unauthenticated;
+          await ApiService.clearToken();
+        }
+      } else {
+        _status = AuthStatus.unauthenticated;
+        _user = null; // Clear user data when no token
+      }
+    } catch (e) {
+      print('Error checking auth status: $e');
       _status = AuthStatus.unauthenticated;
-      _user = null; // Clear user data when no token
-      notifyListeners();
+      _user = null;
     }
+    notifyListeners();
   }
 
   Future<void> _saveUserData(User user) async {
@@ -92,9 +119,24 @@ class AuthProvider extends ChangeNotifier {
         'createdAt': user.createdAt.toIso8601String(),
         'updatedAt': user.updatedAt.toIso8601String(),
       };
-      await prefs.setString('user_data', json.encode(userJson));
+      
+      final jsonString = json.encode(userJson);
+      final success = await prefs.setString('user_data', jsonString);
+      
+      if (success) {
+        // Verifikasi data tersimpan
+        final savedData = prefs.getString('user_data');
+        if (savedData == jsonString) {
+          print('User data berhasil disimpan dan diverifikasi');
+        } else {
+          print('Warning: User data tersimpan tapi tidak sama');
+        }
+      } else {
+        print('Warning: SharedPreferences.setString() returned false untuk user data');
+      }
     } catch (e) {
       print('Error saving user data: $e');
+      // Tidak throw error, karena user data bisa dimuat ulang
     }
   }
 
@@ -155,9 +197,24 @@ class AuthProvider extends ChangeNotifier {
       // Call repository logout to clear token from storage
       await _loginUseCase.repository.logout();
       
-      // Clear user data from SharedPreferences
+      // Clear user data from SharedPreferences dengan verifikasi
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('user_data');
+      
+      // Verifikasi bahwa data benar-benar terhapus
+      final userData = prefs.getString('user_data');
+      if (userData != null) {
+        print('WARNING: User data masih ada setelah logout, mencoba lagi...');
+        await prefs.remove('user_data');
+      }
+      
+      // Verifikasi token juga terhapus
+      if (ApiService.token != null) {
+        print('WARNING: Token masih ada setelah logout');
+        await ApiService.clearToken();
+      }
+      
+      print('Logout berhasil, semua data dibersihkan');
     } catch (e) {
       // Log error but continue with local logout
       print('Logout error: $e');

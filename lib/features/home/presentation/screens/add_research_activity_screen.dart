@@ -32,7 +32,6 @@ class _AddResearchActivityScreenState extends State<AddResearchActivityScreen> {
   DateTime? startDate;
   DateTime? endDate;
   final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
   
   // API data
   List<String> _kotaList = [];
@@ -81,7 +80,6 @@ class _AddResearchActivityScreenState extends State<AddResearchActivityScreen> {
     if (widget.existingActivity != null) {
       final activity = widget.existingActivity!;
       _titleController.text = activity.title;
-      _descriptionController.text = activity.description;
       // Split category string by comma to create separate tags
       selectedCategories = activity.category.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
       selectedStatus = activity.status;
@@ -132,7 +130,6 @@ class _AddResearchActivityScreenState extends State<AddResearchActivityScreen> {
   @override
   void dispose() {
     _titleController.dispose();
-    _descriptionController.dispose();
     super.dispose();
   }
 
@@ -144,8 +141,7 @@ class _AddResearchActivityScreenState extends State<AddResearchActivityScreen> {
         selectedLocationType == null ||
         selectedLocation == null ||
         startDate == null ||
-        endDate == null ||
-        _descriptionController.text.isEmpty) {
+        endDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Mohon lengkapi semua field'),
@@ -258,7 +254,7 @@ class _AddResearchActivityScreenState extends State<AddResearchActivityScreen> {
               locationType: selectedLocationType!,
               startDate: startDate!,
               endDate: endDate!,
-              description: _descriptionController.text,
+              description: '',
               created: widget.existingActivity!.created,
               isEdited: true, // Mark as edited
             );
@@ -274,7 +270,7 @@ class _AddResearchActivityScreenState extends State<AddResearchActivityScreen> {
               locationType: selectedLocationType!,
               startDate: startDate!,
               endDate: endDate!,
-              description: _descriptionController.text,
+              description: '',
             );
             widget.onActivityAdded!(newActivity);
           }
@@ -390,17 +386,7 @@ class _AddResearchActivityScreenState extends State<AddResearchActivityScreen> {
               items: categories,
               onChanged: (values) => setState(() => selectedCategories = values),
             ),
-            
-            const SizedBox(height: AppSizes.xl),
-            
-            // Uraian Aktivitas
-            FormWidgets.buildTextField(
-              label: 'Uraian Aktivitas',
-              controller: _descriptionController,
-              maxLines: 4,
-              hintText: 'Masukkan uraian aktivitas',
-            ),
-            
+             
             const SizedBox(height: AppSizes.xl),
             
             // Status Aktivitas

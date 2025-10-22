@@ -20,8 +20,18 @@ class AuthRepositoryImpl implements AuthRepository {
         final data = response['data'];
         final type = response['type'];
         
-        // Store token for future API calls
-        await ApiService.setToken(data['token']);
+        // Validasi token ada
+        if (data['token'] == null || data['token'].toString().isEmpty) {
+          throw Exception('Token tidak diterima dari server');
+        }
+        
+        // Store token for future API calls - dengan error handling
+        try {
+          await ApiService.setToken(data['token']);
+        } catch (e) {
+          print('Error menyimpan token: $e');
+          throw Exception('Gagal menyimpan token: $e');
+        }
         
         // Parse last_fung
         LastFung? lastFung;
