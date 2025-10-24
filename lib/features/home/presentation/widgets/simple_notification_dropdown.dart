@@ -10,39 +10,8 @@ class SimpleNotificationDropdown extends StatefulWidget {
 }
 
 class _SimpleNotificationDropdownState extends State<SimpleNotificationDropdown> {
-  // Sample notification data for badge count
-  final List<Map<String, dynamic>> _notifications = [
-    {
-      'id': '1',
-      'title': 'Proposal Riset Disetujui',
-      'message': 'Proposal "Penelitian AI" telah disetujui oleh reviewer',
-      'category': 'NUSARISET',
-      'time': '2 jam yang lalu',
-      'isRead': false,
-      'icon': Icons.check_circle,
-      'iconColor': Colors.green,
-    },
-    {
-      'id': '2',
-      'title': 'Cuti Ditolak',
-      'message': 'Permohonan cuti tanggal 15-20 Januari ditolak',
-      'category': 'NUSAHUMA',
-      'time': '1 hari yang lalu',
-      'isRead': false,
-      'icon': Icons.cancel,
-      'iconColor': Colors.red,
-    },
-    {
-      'id': '3',
-      'title': 'Surat Masuk Baru',
-      'message': 'Ada 3 surat masuk yang perlu ditindaklanjuti',
-      'category': 'NUSAREKA',
-      'time': '2 hari yang lalu',
-      'isRead': true,
-      'icon': Icons.mail,
-      'iconColor': Colors.blue,
-    },
-  ];
+  // Data notifikasi kosong - akan diisi dari API
+  final List<Map<String, dynamic>> _notifications = [];
 
   @override
   Widget build(BuildContext context) {

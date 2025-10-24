@@ -168,7 +168,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ),
             SizedBox(height: 24),
             Text(
-              'No notifications yet',
+              'No Notifications yet',
               style: AppTextStyles.h2.copyWith(
                 color: Colors.black87,
                 fontWeight: FontWeight.bold,
@@ -180,26 +180,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               textAlign: TextAlign.center,
               style: AppTextStyles.bodyMedium.copyWith(
                 color: Colors.grey.shade600,
-              ),
-            ),
-            SizedBox(height: 32),
-            Text(
-              'Missing notifications?',
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: Colors.grey.shade600,
-              ),
-            ),
-            SizedBox(height: 8),
-            GestureDetector(
-              onTap: () {
-                // Navigate to historical notifications
-              },
-              child: Text(
-                'Go to historical notifications.',
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: Colors.blue.shade600,
-                  decoration: TextDecoration.underline,
-                ),
               ),
             ),
           ],
